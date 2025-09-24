@@ -1,5 +1,6 @@
 package supermercado;
 
+import java.time.*;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -181,6 +182,71 @@ public boolean agregarProducto(String producto, float precio) throws Exception {
         return gondola.remove(p);
     }
  
+    
+    //clientes
+    
+    public boolean agregarCliente(String cliente,long dni, String direccion) throws Exception {
+    	
+    	// Verificar si ya existe un cliente con ese dni
+    	
+        for (Cliente c : listaCliente) {
+            if (c.getDni() == dni) {
+            	
+              throw new Exception ("Ya existe un cliente con ese DNI: "+dni);
+            }
+        }
+        
+        // Si no existe, crearlo y agregarlo
+        int nuevoId = listaCliente.size() + 1;
+        Cliente nuevoCliente = new Cliente(nuevoId, cliente, dni, direccion);
+        return listaCliente.add(nuevoCliente);
+
+    	
+    }
+    
+    public Cliente traerCliente(int idCliente) {
+    	
+    	int i= 0;
+    	boolean encontrado = false;
+    	
+    	Cliente c = null;
+    	
+    	while(i<listaCliente.size() && !encontrado) {
+    		
+    		if(listaCliente.get(i).getIdCliente() == idCliente) {
+    			
+    			encontrado = true;
+    			c = listaCliente.get(i);
+    		}
+    		
+    		i++;
+    	}
+    	
+    	return c;
+    	
+    }
+    
+    
+    public boolean eliminarCliente(int idCliente) {
+        Cliente cliente = traerCliente(idCliente);
+        
+        if (cliente == null) {
+            return false;
+        }
+        
+        return listaCliente.remove(cliente);
+    }
+    
+    
+    //Carritos
+    
+    public boolean agregarCarrito(LocalDate fecha, LocalTime hora, Cliente cliente) {
+    	
+        int nuevoId = listaCarrito.size() + 1;
+        Carrito nuevoCarrito = new Carrito(nuevoId, fecha, hora, cliente);
+        return listaCarrito.add(nuevoCarrito);
+        
+    }
  
 
 }

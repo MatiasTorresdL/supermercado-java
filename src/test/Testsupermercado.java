@@ -28,7 +28,7 @@ public class Testsupermercado {
         for (Producto p : jumbo.getGondola()) {
         	
         	System.out.println(p);
-        }
+  }
         
         
       // traer productos
