@@ -100,28 +100,37 @@ public class Carrito {
   //METODOS PEDIDOS
     
     public boolean agregarItem(Producto producto, int cantidad) {
-    	
-        // 1. Validar parámetros
+        // 1. Validamos parámetros
         if (producto == null || cantidad <= 0) {
             return false;
         }
         
-        // 2. Buscar si ya existe un item con este producto
+        // 2. Inicializamos variables para la búsqueda
+        int i = 0;
+        boolean encontrado = false;
         
-        for (ItemCarrito item : isItem) {
-        	
+        // 3. Buscamos si ya existe un item con este producto usando bucle while
+        while (i < isItem.size() && !encontrado) {
+            ItemCarrito item = isItem.get(i);
+            
+            // Verificamos si el item contiene el producto buscado
             if (item.getProducto().getIdProducto() == producto.getIdProducto()) {
-            	
-                // 3. Si existe, incrementar cantidad
+                encontrado = true; // Marcamos que encontramos el item
+                
+                // Si existe, incrementamos la cantidad
                 item.setCantidad(item.getCantidad() + cantidad);
-                return true;
             }
+            i++;
         }
         
-        // 4. Si no existe, crear nuevo item
-        int nuevoId = isItem.size() + 1;
-        ItemCarrito nuevoItem = new ItemCarrito(nuevoId, producto, cantidad);
-        return isItem.add(nuevoItem);
+        // 4. Si no encontramos el item, lo creamos y agregamos
+        if (!encontrado) {
+            int nuevoId = isItem.size() + 1;
+            ItemCarrito nuevoItem = new ItemCarrito(nuevoId, producto, cantidad);
+            return isItem.add(nuevoItem);
+        }
+        
+        return true; // Retornamos true si ya existía y lo incrementamos
     }
     
     

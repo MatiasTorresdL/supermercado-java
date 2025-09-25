@@ -81,128 +81,160 @@ public boolean equals(Supermercado supermercado) {
 }
 //METODOS PEDIDOS
 
-public boolean agregarProducto(String producto, float precio) throws Exception {
-	
-	// Recorremos cada producto en la gondola
-	
-    for (Producto p : gondola) {
-    	
-        // compara nombres ignorando mayus y minus
-    	
+    public boolean agregarProducto(String producto, float precio) throws Exception {
+    
+	// Inicializamos variables para la búsqueda
+    int i = 0;
+    boolean existe = false;
+    
+    // Recorremos la gondola con bucle while para verificar si el producto ya existe
+   
+    while (i < gondola.size() && !existe) {
+        Producto p = gondola.get(i);
+        
+        // Comparamos nombres ignorando mayúsculas y minúsculas
+        
         if (p.getProducto().equalsIgnoreCase(producto)) {
-            throw new Exception("El producto " + producto + " ya existe en la gondola");
+            existe = true; // Marcamos que encontramos el producto
         }
+        i++;
     }
     
-    //  Si no existe, creamos y agregamos el nuevo producto
+    // Si el producto ya existe, lanzamos excepción
+    if (existe) {
+        throw new Exception("El producto " + producto + " ya existe en la gondola");
+    }
     
-		int nuevoId = gondola.size()+1;
-		Producto nuevo = new Producto(nuevoId,producto,precio);
-		
-		return gondola.add(nuevo);
-		
+    // Si no existe, creamos y agregamos el nuevo producto
+    int nuevoId = gondola.size() + 1;
+    Producto nuevo = new Producto(nuevoId, producto, precio);
+    
+    return gondola.add(nuevo);
 }
 
 
- public Producto traerProducto(int idProducto)  {
-	 
-	 int i = 0;
-	 boolean encontrado = false;
-	 
-	 Producto p = null;
-	 
-	 while (i < gondola.size() && !encontrado) {
-		 if (gondola.get(i).getIdProducto() == idProducto) {
-			 
-			 encontrado = true;
-			 p = gondola.get(i);
-		 }
-		 i++;
-		 
-	 }
-		 
-		 return p;
-		 
-	 
- }
- 
- 
-    public boolean modificarProducto(int idProducto, String producto, double precio) throws Exception {
+
+   public Producto traerProducto(int idProducto) {
+	
+    int i = 0;
+    boolean encontrado = false;
+    Producto p = null;
+    
+    // Recorremos la gondola con bucle while
+    while (i < gondola.size() && !encontrado) {
     	
-    	// 1. Buscar el producto por ID usando el método traerProducto()
+        // Verificamos si el ID del producto actual coincide con el buscado
     	
-        Producto p = traerProducto(idProducto);
-        
-        // 2. Si no existe, devolver exception
-        if (p == null) {
-            throw new Exception ("El producto con ID"+ idProducto + "no existe");
+    	
+        if (gondola.get(i).getIdProducto() == idProducto) {
+        	
+        	
+            encontrado = true; // Marcamos que encontramos el producto
+            p = gondola.get(i); // Guardamos el producto encontrado
         }
         
-        // 3. Si existe, modificar sus atributos
-        p.setProducto(producto);
-        p.setPrecio((float) precio); // Convertimos double a float
-        
-        return true;
-    	
-    	
+        i++;
     }
     
+    return p; // Retornamos el producto encontrado o null
+}
+
+ 
+    public boolean modificarProducto(int idProducto, String producto, double precio) throws Exception {
+    
+    	
+    	// 1. Buscamos el producto por ID usando el método traerProducto()
+    Producto p = traerProducto(idProducto);
+    
+    // 2. Si no existe, lanzamos excepción
+    if (p == null) {
+        throw new Exception("El producto con ID " + idProducto + " no existe");
+    }
+    
+    // 3. Si existe, modificamos sus atributos
+    p.setProducto(producto);
+    p.setPrecio((float) precio); // Convertimos double a float
+    
+    return true;
+}
+
+    
     public boolean productoEnAlgunCarrito(int idProducto) {
-        for (Carrito carrito : listaCarrito) {
-            for (ItemCarrito item : carrito.getIsItem()) {
+        // Inicializamos variables para los bucles anidados
+        int i = 0;
+        boolean encontrado = false;
+        
+        // Recorremos la lista de carritos con bucle while
+        while (i < listaCarrito.size() && !encontrado) {
+            Carrito carrito = listaCarrito.get(i);
+            
+            // Para cada carrito, recorremos sus items
+            int j = 0;
+            while (j < carrito.getIsItem().size() && !encontrado) {
+                ItemCarrito item = carrito.getIsItem().get(j);
+                
+                // Verificamos si el item contiene el producto buscado
                 if (item.getProducto().getIdProducto() == idProducto) {
-                    return true;
+                    encontrado = true; // Marcamos que encontramos el producto
                 }
+                j++;
             }
+            i++;
         }
-        return false;
+        
+        return encontrado;
     }
     
     
     public boolean eliminarProducto(int idProducto) throws Exception {
-    	
-        // 1. Buscar el producto por ID
-    	
+        // 1. Buscamos el producto por ID
         Producto p = traerProducto(idProducto);
         
-        // 2. Si no existe, devolver false
-        
+        // 2. Si no existe, lanzamos excepción
         if (p == null) {
-            throw new Exception ("No existe el producto con id: "+idProducto);
+            throw new Exception("No existe el producto con id: " + idProducto);
         }
         
-        if(productoEnAlgunCarrito(idProducto)) {
-        	
-        	throw new Exception ("El producto con id "+ idProducto +" está en algun carrito ");
+        // 3. Verificamos si el producto está en algún carrito
+        if (productoEnAlgunCarrito(idProducto)) {
+            throw new Exception("El producto con id " + idProducto + " está en algún carrito");
         }
         
-        
-        // 3. Eliminar el producto de la lista
-        
+        // 4. Eliminamos el producto de la lista
         return gondola.remove(p);
     }
- 
+    
     
     //clientes
     
-    public boolean agregarCliente(String cliente,long dni, String direccion) throws Exception {
-    	
-    	// Verificar si ya existe un cliente con ese dni
-    	
-        for (Cliente c : listaCliente) {
+    public boolean agregarCliente(String cliente, long dni, String direccion) throws Exception {
+        
+    	// Inicializamos variables para la búsqueda
+        int i = 0;
+        boolean existe = false;
+        
+        // Recorremos la lista de clientes con bucle while
+        while (i < listaCliente.size() && !existe) {
+            Cliente c = listaCliente.get(i);
+            
+            // Verificamos si ya existe un cliente con ese DNI
             if (c.getDni() == dni) {
-            	
-              throw new Exception ("Ya existe un cliente con ese DNI: "+dni);
+                existe = true; // Marcamos que encontramos el cliente
             }
+            i++;
         }
         
-        // Si no existe, crearlo y agregarlo
+        // Si el cliente ya existe, lanzamos excepción
+        if (existe) {
+            throw new Exception("Ya existe un cliente con ese DNI: " + dni);
+        }
+        
+        // Si no existe, lo creamos y agregamos
         int nuevoId = listaCliente.size() + 1;
         Cliente nuevoCliente = new Cliente(nuevoId, cliente, dni, direccion);
         return listaCliente.add(nuevoCliente);
-
-    	
     }
+    
     
     public Cliente traerCliente(int idCliente) {
     	
@@ -240,23 +272,35 @@ public boolean agregarProducto(String producto, float precio) throws Exception {
     
     //Carritos
     
-    public boolean agregarCarrito(LocalDate fecha, LocalTime hora, Cliente cliente)throws Exception {
-    	
-    	 // Verificar si ya existe un carrito con las mismas características
-        for (Carrito c : listaCarrito) {
+    public boolean agregarCarrito(LocalDate fecha, LocalTime hora, Cliente cliente) throws Exception {
+        // Inicializamos variables para la búsqueda
+        int i = 0;
+        boolean existe = false;
+        
+        // Recorremos la lista de carritos con bucle while
+        while (i < listaCarrito.size() && !existe) {
+            Carrito c = listaCarrito.get(i);
+            
+            // Verificamos si ya existe un carrito con las mismas características
             if (c.getFecha().equals(fecha) && 
                 c.getHora().equals(hora) && 
                 c.getCliente().equals(cliente)) {
-                throw new Exception("Ya existe un carrito para este cliente en la misma fecha y hora");
+                existe = true; // Marcamos que encontramos el carrito
             }
+            i++;
         }
-    
-    	
+        
+        // Si el carrito ya existe, lanzamos excepción
+        if (existe) {
+            throw new Exception("Ya existe un carrito para este cliente en la misma fecha y hora");
+        }
+        
+        // Si no existe, lo creamos y agregamos
         int nuevoId = listaCarrito.size() + 1;
         Carrito nuevoCarrito = new Carrito(nuevoId, fecha, hora, cliente);
         return listaCarrito.add(nuevoCarrito);
-        
     }
+    
     
     public Carrito traerCarrito(int idCarrito) {
     	
