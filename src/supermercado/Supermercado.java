@@ -227,11 +227,11 @@ public boolean agregarProducto(String producto, float precio) throws Exception {
     }
     
     
-    public boolean eliminarCliente(int idCliente) {
+    public boolean eliminarCliente(int idCliente) throws Exception {
         Cliente cliente = traerCliente(idCliente);
         
         if (cliente == null) {
-            return false;
+           throw new Exception("No se encontro cliente con id: "+idCliente);
         }
         
         return listaCliente.remove(cliente);
@@ -240,12 +240,57 @@ public boolean agregarProducto(String producto, float precio) throws Exception {
     
     //Carritos
     
-    public boolean agregarCarrito(LocalDate fecha, LocalTime hora, Cliente cliente) {
+    public boolean agregarCarrito(LocalDate fecha, LocalTime hora, Cliente cliente)throws Exception {
+    	
+    	 // Verificar si ya existe un carrito con las mismas características
+        for (Carrito c : listaCarrito) {
+            if (c.getFecha().equals(fecha) && 
+                c.getHora().equals(hora) && 
+                c.getCliente().equals(cliente)) {
+                throw new Exception("Ya existe un carrito para este cliente en la misma fecha y hora");
+            }
+        }
+    
     	
         int nuevoId = listaCarrito.size() + 1;
         Carrito nuevoCarrito = new Carrito(nuevoId, fecha, hora, cliente);
         return listaCarrito.add(nuevoCarrito);
         
+    }
+    
+    public Carrito traerCarrito(int idCarrito) {
+    	
+    	int i= 0;
+    	boolean encontrado = false;
+    	
+    	Carrito c = null;
+    	
+    	while(i<listaCarrito.size() && !encontrado) {
+    		
+    		if(listaCarrito.get(i).getIdCarrito() == idCarrito) {
+    			
+    			encontrado = true;
+    			c = listaCarrito.get(i);
+    		}
+    		
+    		i++;
+    	}
+    	
+    	return c;
+    	
+    }
+    
+    
+    public boolean eliminarCarrito(int idCarrito) throws Exception {
+    	
+    Carrito carrito = traerCarrito(idCarrito);
+        
+        if (carrito == null) {
+           throw new Exception("No se encontro el carrito con id: "+idCarrito);
+        }
+        
+        return listaCarrito.remove(carrito);
+    	
     }
  
 
